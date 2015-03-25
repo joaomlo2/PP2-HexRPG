@@ -1,0 +1,5 @@
+hyper.exe: hyper.cpp graph.cpp hyperpoint.cpp geometry.cpp cell.cpp heptagon.cpp game.cpp polygons.cpp classes.cpp hyper.res
+	g++ -mwindows hyper.cpp hyper.res -o hyper.exe -lSDL -lSDL_mixer -lopengl32 SDL_ttf.dll SDL_gfx.dll -O3
+
+hyper.res: hyper.rc hr-icon.ico
+	windres hyper.rc -O coff -o hyper.res
