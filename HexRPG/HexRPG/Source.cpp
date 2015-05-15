@@ -17,8 +17,253 @@ typedef struct hexagono
 	int Tipo_de_Terreno; //0-Planície 1-Subida/Descida Suave 2-Montanha Íngreme
 	int Tipo_de_Bioma; //0-Floresta/Campo Normal 1-Tundra Gelada 2-Deserto
 	int Aldeia; //0-Não 1-Sim
-	int Acampamento; //(Inimigo) 0-Não 1-Sim
+	int Acampamento; //(Militar)/ 0-Não 1-Sim
+	int Capital;
 }*HEX;
+
+typedef struct unidade
+{
+	int Tipo;
+	int Nivel;
+	int Comida_Necessaria;
+	struct exercito*Prox;
+}*Unidade;
+
+typedef struct jogador
+{
+	int Ouro;
+	int Comida;
+	int X;
+	int Y;
+	struct unidade*Exercito;
+}*Jogador;
+
+//Funções para as estruturas das unidades
+
+void Print_Exercito(Unidade exercito)
+{
+	Unidade aux = exercito;
+	int i = 1;
+	while (aux != NULL)
+	{
+		printf("\n%d-\nNivel:%d\nTipo:%d\nSustento Necessario:%d\n", i, aux->Nivel, aux->Tipo,aux->Comida_Necessaria);
+		i++;
+		aux = aux->Prox;
+	}
+}
+
+Unidade Iniciar_Exercito(Unidade jogador)
+{
+	Unidade aux = jogador;
+	jogador->Nivel = 0;
+	jogador->Tipo = 0;
+	jogador->Comida_Necessaria = 0;
+	jogador->Prox = (Unidade)malloc(sizeof(struct unidade));
+	aux = aux->Prox;
+	aux->Nivel = 0;
+	aux->Tipo = 0;
+	aux->Comida_Necessaria = 0;
+	aux->Prox = (Unidade)malloc(sizeof(struct unidade));
+	aux = aux->Prox;
+	aux->Nivel = 0;
+	aux->Tipo = 0;
+	aux->Comida_Necessaria = 0;
+	aux->Prox = NULL;
+	return jogador;
+}
+
+int Ja_Tem_Unidades_Desse_Tipo(Unidade exercito,int tipo)
+{
+	Unidade aux = exercito;
+	int tem=0;
+	while (aux != NULL)
+	{
+		if (aux->Tipo == tipo)
+		{
+			tem = 1;
+		}
+		aux = aux->Prox;
+	}
+	return tem;
+}
+
+Unidade Adicionar_ou_Melhorar_Unidade(Unidade exercito,int tipo)
+{
+	if (exercito == 0)
+	{
+		exercito->Tipo = tipo;
+		exercito->Nivel = 1;
+		exercito->Comida_Necessaria++;
+	}
+	else
+	{
+		if (Ja_Tem_Unidades_Desse_Tipo(exercito,tipo) == 1)
+		{
+			Unidade aux = exercito;
+			while (aux->Tipo != tipo && aux != NULL)
+			{
+				aux = aux->Prox;
+			}
+			aux->Nivel++;
+			aux->Comida_Necessaria++;
+			return exercito;
+		}
+		else
+		{
+			Unidade aux = exercito;
+			while (aux->Nivel != 0 && aux->Tipo != 0 && aux != NULL)
+			{
+				aux = aux->Prox;
+			}
+			aux->Nivel = 1;
+			aux->Tipo = tipo;
+			exercito->Comida_Necessaria++;
+		}
+	}
+	return exercito;
+}
+
+Unidade Reorganizar_Exercito(Unidade exercito)
+{
+	int acabou = 0;
+	Unidade aux = NULL,aux2=NULL;
+	while (acabou == 0)
+	{
+		int decisao,decisao2,tipo_a,tipo_b,nivel_a,nivel_b,comida_a,comida_b;
+		printf("Qual a posição que pretende mover?(1(Frente)-3(Tras) para escolher, ou outro numero qualquer para não reorganizar)");
+		Print_Exercito(exercito);
+		scanf("%d",&decisao);
+		switch (decisao)
+		{
+		case 1:
+			aux = exercito;
+			nivel_a = exercito->Nivel;
+			tipo_a = exercito->Tipo;
+			comida_a = exercito->Comida_Necessaria;
+			printf("Onde pretende inserir a unidade?\n");
+			scanf("%d",&decisao2);
+			switch (decisao2)
+			{
+			case 1:
+				printf("Unidade Inserida!\n");
+				break;
+			case 2:
+				aux = aux->Prox;
+				tipo_b = aux->Nivel;
+				nivel_b = aux->Tipo;
+				comida_b = aux->Comida_Necessaria;
+				aux->Nivel = nivel_a;
+				aux->Tipo = tipo_a;
+				aux->Comida_Necessaria = comida_a;
+				exercito->Nivel = nivel_b;
+				exercito->Tipo = tipo_b;
+				exercito->Comida_Necessaria = comida_b;
+				printf("Unidade Inserida!\n");
+				break;
+			case 3:
+				aux = aux->Prox;
+				aux = aux->Prox;
+				tipo_b = aux->Nivel;
+				nivel_b = aux->Tipo;
+				comida_b = aux->Comida_Necessaria;
+				aux->Nivel = nivel_a;
+				aux->Tipo = tipo_a;
+				aux->Comida_Necessaria = comida_a;
+				exercito->Nivel = nivel_b;
+				exercito->Tipo = tipo_b;
+				exercito->Comida_Necessaria = comida_b;
+				printf("Unidade Inserida!\n");
+				break;
+			}
+			break;
+		case 2:
+			aux = exercito->Prox;
+			tipo_a = aux->Tipo;
+			nivel_a = aux->Nivel;
+			comida_a = aux->Comida_Necessaria;
+			printf("Onde pretende inserir a unidade?\n");
+			scanf("%d",&decisao2);
+			switch (decisao2)
+			{
+			case 1:
+				tipo_b = exercito->Tipo;
+				nivel_b = exercito->Nivel;
+				comida_b = exercito->Comida_Necessaria;
+				exercito->Tipo = tipo_a;
+				exercito->Nivel = nivel_a;
+				exercito->Comida_Necessaria = comida_a;
+				aux->Nivel = nivel_b;
+				aux->Tipo = tipo_b;
+				aux->Comida_Necessaria = comida_b;
+				printf("Unidade Inserida!\n");
+				break;
+			case 2:
+				printf("Unidade Inserida!\n");
+				break;
+			case 3:
+				aux2 = aux->Prox;
+				tipo_b = aux2->Tipo;
+				nivel_b = aux2->Nivel;
+				comida_b = aux2->Comida_Necessaria;
+				aux2->Tipo = tipo_a;
+				aux2->Nivel = nivel_a;
+				aux2->Comida_Necessaria = comida_a;
+				aux->Nivel = nivel_b;
+				aux->Tipo = tipo_b;
+				aux->Comida_Necessaria = comida_b;
+				printf("Unidade Inserida!\n");
+				break;
+			}
+			break;
+		case 3:
+			aux = exercito->Prox;
+			aux = aux->Prox;
+			tipo_a = aux->Tipo;
+			nivel_a = aux->Nivel;
+			comida_a = aux->Comida_Necessaria;
+			printf("Onde pretende inserir a unidade?\n");
+			scanf("%d", &decisao2);
+			switch (decisao2)
+			{
+			case 1:
+				tipo_b = exercito->Tipo;
+				nivel_b = exercito->Nivel;
+				comida_b = exercito->Comida_Necessaria;
+				exercito->Tipo = tipo_a;
+				exercito->Nivel = nivel_a;
+				exercito->Comida_Necessaria = comida_a;
+				aux->Nivel = nivel_b;
+				aux->Tipo = tipo_b;
+				aux->Comida_Necessaria = comida_b;
+				printf("Unidade Inserida!\n");
+				break;
+			case 2:
+				aux2 = exercito->Prox;
+				tipo_b = aux2->Tipo;
+				nivel_b = aux2->Nivel;
+				comida_b = aux2->Comida_Necessaria;
+				aux2->Tipo = tipo_a;
+				aux2->Nivel = nivel_a;
+				aux2->Comida_Necessaria = comida_a;
+				aux->Nivel = nivel_b;
+				aux->Tipo = tipo_b;
+				aux->Comida_Necessaria = comida_b;
+				printf("Unidade Inserida!\n");
+				break;
+			case 3:
+				printf("Unidade Inserida!\n");;
+				break;
+			}
+			break;
+		default:
+			acabou = 1;
+			break;
+		}
+	}
+	return exercito;
+}
+
+//Funções para células HEX
 
 int Encontrou_Celula(HEX apt, int X, int Y)
 {
@@ -237,14 +482,18 @@ HEX Inicializar(HEX Mapa)
 {
 	if (Mapa == NULL)
 	{
+		srand(time(NULL));
 		Mapa = (HEX)malloc(sizeof(struct hexagono));
 		Mapa->x = 0;
 		Mapa->y = 0;
-		Mapa->Acampamento = rand() % 10;
-		Mapa->Facção = 0;
-		Mapa->Aldeia = 1;
-		Mapa->Tipo_de_Bioma = 0;
-		Mapa->Tipo_de_Terreno = 0;
+		Mapa->Acampamento = rand() % 2;
+		Mapa->Facção = rand() % 3;
+		if (Mapa->Acampamento = 1)
+			Mapa->Aldeia = 0;
+		else
+			Mapa->Aldeia = rand() % 2;
+		Mapa->Tipo_de_Bioma = rand() % 4;
+		Mapa->Tipo_de_Terreno = rand() % 4;
 		Mapa->N = NULL;
 		Mapa->NE = NULL;
 		Mapa->NO = NULL;
@@ -265,6 +514,7 @@ void Add_Hex(HEX apt,int dir)
 	{
 		if (aux->NO == NULL)
 		{
+			srand((time(NULL))*(time(NULL)));
 			aux = aux->NO;
 			aux = (HEX)malloc(sizeof(struct hexagono));
 			aux->x=(apt->x) - 1;
@@ -274,11 +524,14 @@ void Add_Hex(HEX apt,int dir)
 			aux->SO = NULL;
 			aux->S = NULL;
 			aux->NE = NULL;
-			aux->Acampamento = 0;
-			aux->Aldeia = 0;
-			aux->Facção = 0;
-			aux->Tipo_de_Bioma = 0;
-			aux->Tipo_de_Terreno = 0;
+			aux->Acampamento = rand() % 2;
+			aux->Facção = rand() % 3;
+			if (aux->Acampamento = 1)
+				aux->Aldeia = 0;
+			else
+				aux->Aldeia = rand() % 2;
+			aux->Tipo_de_Bioma = rand() % 4;
+			aux->Tipo_de_Terreno = rand() % 4;
 			apt->NO = aux;
 			aux->SE = apt;
 		}
@@ -291,6 +544,7 @@ void Add_Hex(HEX apt,int dir)
 	{
 		if (aux->N == NULL)
 		{
+			srand(sqrt(time(NULL)));
 			aux = aux->N;
 			aux = (HEX)malloc(sizeof(struct hexagono));
 			aux->x = apt->x;
@@ -300,11 +554,14 @@ void Add_Hex(HEX apt,int dir)
 			aux->NE = NULL;
 			aux->SE = NULL;
 			aux->SO = NULL;
-			aux->Acampamento = 0;
-			aux->Aldeia = 0;
-			aux->Facção = 0;
-			aux->Tipo_de_Bioma = 0;
-			aux->Tipo_de_Terreno = 0;
+			aux->Acampamento = rand() % 2;
+			aux->Facção = rand() % 3;
+			if (aux->Acampamento = 1)
+				aux->Aldeia = 0;
+			else
+				aux->Aldeia = rand() % 2;
+			aux->Tipo_de_Bioma = rand() % 4;
+			aux->Tipo_de_Terreno = rand() % 4;
 			apt->N = aux;
 			aux->S = apt;
 		}
@@ -317,6 +574,7 @@ void Add_Hex(HEX apt,int dir)
 	{
 		if (aux->NE == NULL)
 		{
+			srand((time(NULL))*4);
 			aux = aux->NE;
 			aux = (HEX)malloc(sizeof(struct hexagono));
 			aux->x = (apt->x) + 1;
@@ -326,11 +584,14 @@ void Add_Hex(HEX apt,int dir)
 			aux->SE = NULL;
 			aux->S = NULL;
 			aux->NO = NULL;
-			aux->Acampamento = 0;
-			aux->Aldeia = 0;
-			aux->Facção = 0;
-			aux->Tipo_de_Bioma = 0;
-			aux->Tipo_de_Terreno = 0;
+			aux->Acampamento = rand() % 2;
+			aux->Facção = rand() % 3;
+			if (aux->Acampamento = 1)
+				aux->Aldeia = 0;
+			else
+				aux->Aldeia = rand() % 2;
+			aux->Tipo_de_Bioma = rand() % 4;
+			aux->Tipo_de_Terreno = rand() % 4;
 			apt->NE = aux;
 			aux->SO = apt;
 		}
@@ -343,6 +604,7 @@ void Add_Hex(HEX apt,int dir)
 	{
 		if (aux->SE == NULL)
 		{
+			srand(sqrt(time(NULL))*6);
 			aux = aux->SE;
 			aux = (HEX)malloc(sizeof(struct hexagono));
 			aux->x = (apt->x) + 1;
@@ -352,11 +614,14 @@ void Add_Hex(HEX apt,int dir)
 			aux->SE = NULL;
 			aux->SO = NULL;
 			aux->NE = NULL;
-			aux->Acampamento = 0;
-			aux->Aldeia = 0;
-			aux->Facção = 0;
-			aux->Tipo_de_Bioma = 0;
-			aux->Tipo_de_Terreno = 0;
+			aux->Acampamento = rand() % 2;
+			aux->Facção = rand() % 3;
+			if (aux->Acampamento = 1)
+				aux->Aldeia = 0;
+			else
+				aux->Aldeia = rand() % 2;
+			aux->Tipo_de_Bioma = rand() % 4;
+			aux->Tipo_de_Terreno = rand() % 4;
 			apt->SE = aux;
 			aux->NO = apt;
 		}
@@ -369,6 +634,7 @@ void Add_Hex(HEX apt,int dir)
 	{
 		if (aux->S == NULL)
 		{
+			srand(sqrt(time(NULL)));
 			aux = aux->S;
 			aux = (HEX)malloc(sizeof(struct hexagono));
 			aux->x = (apt->x);
@@ -378,11 +644,14 @@ void Add_Hex(HEX apt,int dir)
 			aux->SE = NULL;
 			aux->SO = NULL;
 			aux->NE = NULL;
-			aux->Acampamento = 0;
-			aux->Aldeia = 0;
-			aux->Facção = 0;
-			aux->Tipo_de_Bioma = 0;
-			aux->Tipo_de_Terreno = 0;
+			aux->Acampamento = rand() % 2;
+			aux->Facção = rand() % 3;
+			if (aux->Acampamento = 1)
+				aux->Aldeia = 0;
+			else
+				aux->Aldeia = rand() % 2;
+			aux->Tipo_de_Bioma = rand() % 4;
+			aux->Tipo_de_Terreno = rand() % 4;
 			apt->S = aux;
 			aux->N = apt;
 		}
@@ -395,6 +664,7 @@ void Add_Hex(HEX apt,int dir)
 	{
 		if (aux->SO == NULL)
 		{
+			srand(sqrt(time(NULL)));
 			aux = aux->SO;
 			aux = (HEX)malloc(sizeof(struct hexagono));
 			aux->x = (apt->x) - 1;
@@ -404,11 +674,14 @@ void Add_Hex(HEX apt,int dir)
 			aux->SE = NULL;
 			aux->SO = NULL;
 			aux->NO = NULL;
-			aux->Acampamento = 0;
-			aux->Aldeia = 0;
-			aux->Facção = 0;
-			aux->Tipo_de_Bioma = 0;
-			aux->Tipo_de_Terreno = 0;
+			aux->Acampamento = rand() % 2;
+			aux->Facção = rand() % 3;
+			if (aux->Acampamento = 1)
+				aux->Aldeia = 0;
+			else
+				aux->Aldeia = rand() % 2;
+			aux->Tipo_de_Bioma = rand() % 4;
+			aux->Tipo_de_Terreno = rand() % 4;
 			apt->SO = aux;
 			aux->NE = apt;
 		}
@@ -419,6 +692,107 @@ void Add_Hex(HEX apt,int dir)
 	}
 	Actualizar_Ligaçoes(apt);
 }
+
+void Del_Hex(HEX apt)
+{
+	if (apt == NULL)
+	{
+		printf("Esse HEX ja foi removido!");
+	}
+	else
+	{
+		if (apt->NO != NULL)
+		{
+			if (apt->N != NULL)
+				apt->N->S = NULL;
+			if (apt->NE != NULL)
+				apt->NE->SO = NULL;
+			if (apt->S != NULL)
+				apt->S->N = NULL;
+			if (apt->SE != NULL)
+				apt->SE->NO=NULL;
+			if (apt->SO != NULL)
+				apt->SO->NE = NULL;
+		}
+		if (apt->N != NULL)
+		{
+			if (apt->NO != NULL)
+				apt->NO->SE = NULL;
+			if (apt->NE != NULL)
+				apt->NE->SO = NULL;
+			if (apt->S != NULL)
+				apt->S->N = NULL;
+			if (apt->SE != NULL)
+				apt->SE->NO = NULL;
+			if (apt->SO != NULL)
+				apt->SO->NE = NULL;
+		}
+		if (apt->NE != NULL)
+		{
+			if (apt->NO != NULL)
+				apt->NO->SE = NULL;
+			if (apt->N != NULL)
+				apt->N->S = NULL;
+			if (apt->S != NULL)
+				apt->S->N = NULL;
+			if (apt->SE != NULL)
+				apt->SE->NO = NULL;
+			if (apt->SO != NULL)
+				apt->SO->NE = NULL;
+		}
+		if (apt->SO!=NULL)
+		{
+			if (apt->NE != NULL)
+				apt->NE->SO = NULL;
+			if (apt->NO != NULL)
+				apt->NO->SE = NULL;
+			if (apt->N != NULL)
+				apt->N->S = NULL;
+			if (apt->S != NULL)
+				apt->S->N = NULL;
+			if (apt->SE != NULL)
+				apt->SE->NO = NULL;
+		}
+		if (apt->S != NULL)
+		{
+			if (apt->NE != NULL)
+				apt->NE->SO = NULL;
+			if (apt->NO != NULL)
+				apt->NO->SE = NULL;
+			if (apt->N != NULL)
+				apt->N->S = NULL;
+			if (apt->SE != NULL)
+				apt->SE->NO = NULL;
+			if (apt->SO != NULL)
+				apt->SO->NE = NULL;
+		}
+		if (apt->SE != NULL)
+		{
+			if (apt->NE != NULL)
+				apt->NE->SO = NULL;
+			if (apt->NO != NULL)
+				apt->NO->SE = NULL;
+			if (apt->N != NULL)
+				apt->N->S = NULL;
+			if (apt->SO != NULL)
+				apt->SO->NE = NULL;
+			if (apt->S != NULL)
+				apt->S->N = NULL;
+		}
+	}
+}
+
+//Funções para a estrutura do jogador
+Jogador Iniciar_Jogador(Jogador j)
+{
+	j->Ouro = 50;
+	j->Comida = 50;
+	j->Exercito = (Unidade)malloc(sizeof(struct unidade));
+	j->Exercito=Iniciar_Exercito(j->Exercito);
+	return j;
+}
+
+//Funções para o jogo em si
 
 void Main_Menu()
 {
@@ -442,7 +816,7 @@ void Main_Menu()
 	}
 }
 
-HEX Jogada(HEX Jogador)
+HEX Movimento(HEX Jogador)
 {
 	HEX aux=NULL;
 	switch (_getch())
@@ -490,8 +864,30 @@ HEX Jogada(HEX Jogador)
 	return aux;
 }
 
+void Evento(HEX Pos, Unidade jogador)
+{
+	if (Pos->Acampamento == 1)
+	{
+		if (Pos->Facção == 0)
+		{
+			int tipo_de_recrutas;
+			srand(time(NULL));
+			printf("Encontrou um acampamento aliado!\n");
+			tipo_de_recrutas = rand() % 3;
+			switch (tipo_de_recrutas)
+			{
+			case 0:
+				printf("Uma dezena de soldados de Infantaria deseja-se alistar");
+			}
+		}
+	}
+}
+
 void main()
 {
+	Jogador j = NULL;
+	j = (Jogador)malloc(sizeof(struct jogador));
+	j = Iniciar_Jogador(j);
 	srand(time(NULL));
 	int Perdeu = 0;
 	HEX Mapa = NULL,Jogador;
@@ -518,10 +914,13 @@ void main()
 	Actualizar_Interface(Jogador);
 	while (Perdeu==0)
 	{
-		Jogador=Jogada(Jogador);
+		Jogador=Movimento(Jogador);
+		j->X = Jogador->x;
+		j->Y = Jogador->y;
 		Actualizar_Ligaçoes(Jogador);
 		Actualizar_Interface(Jogador);
 	}
 	system("pause");
+	free(j);
 	free(Mapa);
 }
