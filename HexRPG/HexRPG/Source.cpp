@@ -52,6 +52,17 @@ void Print_Exercito(Unidade exercito)
 	}
 }
 
+int Comida_Necessaria(Unidade exercito)
+{
+	Unidade aux = exercito;
+	int comida=0;
+	while (aux != NULL)
+	{
+		comida = comida + (aux->Comida_Necessaria);
+	}
+	return comida;
+}
+
 Unidade Iniciar_Exercito(Unidade jogador)
 {
 	Unidade aux = jogador;
@@ -864,20 +875,91 @@ HEX Movimento(HEX Jogador)
 	return aux;
 }
 
-void Evento(HEX Pos, Unidade jogador)
+void Evento(HEX Pos, Jogador jogador)
 {
 	if (Pos->Acampamento == 1)
 	{
 		if (Pos->Facção == 0)
 		{
-			int tipo_de_recrutas;
+			int tipo_de_recrutas,decisao3;
 			srand(time(NULL));
 			printf("Encontrou um acampamento aliado!\n");
 			tipo_de_recrutas = rand() % 3;
 			switch (tipo_de_recrutas)
 			{
 			case 0:
-				printf("Uma dezena de soldados de Infantaria deseja-se alistar");
+				printf("Uma dezena de soldados de Infantaria deseja-se alistar.\nDeseja Contratar(Comida necessaria por movimento: %d, tem:%d)?\n1-Sim\n2-Nao\n",(jogador->Exercito)+1,jogador->Comida);
+				scanf("%d", &decisao3);
+				if (decisao3 == 1)
+				{
+					system("cls");
+					printf("O jogador aceita os soldados de Infantaria para o seu exercito.\nToda a ajuda e necessaria.\n");
+					jogador->Exercito = Adicionar_ou_Melhorar_Unidade(jogador->Exercito, tipo_de_recrutas);
+				}
+				printf("O jogador abandona o acampamento.\n");
+				break;
+			case 1:
+				printf("Uma dezena de Arqueiros deseja-se alistar.\nDeseja Contratar(Comida necessaria por movimento: %d, tem:%d)?\n1-Sim\n2-Nao\n", (jogador->Exercito) + 1, jogador->Comida);
+				scanf("%d", &decisao3);
+				if (decisao3 == 1)
+				{
+					system("cls");
+					printf("O jogador aceita os Arqueiros para o seu exercito.\nToda a ajuda e necessaria.\n");
+					jogador->Exercito = Adicionar_ou_Melhorar_Unidade(jogador->Exercito, tipo_de_recrutas);
+				}
+				printf("O jogador abandona o acampamento.\n");
+				break;
+			case 2:
+				printf("Uma dezena de Cavaleiros deseja-se alistar.\nDeseja Contratar(Comida necessaria por movimento: %d, tem:%d)?\n1-Sim\n2-Nao\n", (jogador->Exercito) + 1, jogador->Comida);
+				scanf("%d", &decisao3);
+				if (decisao3 == 1)
+				{
+					system("cls");
+					printf("O jogador aceita os Cavaleiros para o seu exercito.\nToda a ajuda e necessaria.\n");
+					jogador->Exercito = Adicionar_ou_Melhorar_Unidade(jogador->Exercito, tipo_de_recrutas);
+				}
+				printf("O jogador abandona o acampamento.\n");
+				break;
+			}
+		}
+		else
+		{
+			printf("O jogador encontrou um acampamento inimigo!\n");
+			//Função da Batalha
+		}
+	}
+	else
+	{
+		if (Pos->Aldeia == 1)
+		{
+			if (Pos->Facção == 0)
+			{
+				int decisao3=0;
+				printf("O jogador encontrou uma aldeia aliada!\nOs precos serao baixos no mercado!\n");
+				system("pause");
+				while (decisao3 != 3)
+				{
+					system("cls");
+					printf("O que deseja fazer?\n1-Comprar Comida\n2-Recrutar aldeões\n3-Ir Embora\n");
+					scanf("%d", &decisao3);
+					if (decisao3 == 1)
+					{
+						int quant;
+						system("cls");
+						printf("1 de Comida=1 de Ouro\nQuanta Comida quer?\n");
+						scanf("%d", &quant);
+						if (quant > jogador->Ouro||quant<0)
+						{
+							printf("Essa quantidade nao e valida");
+						}
+						else
+						{
+							jogador->Ouro = (jogador->Ouro) - quant;
+							jogador->Comida = (jogador->Comida) + quant;
+							printf("Foram compradas %d quantidades de Comida por %d de Ouro.\n", quant, quant);
+						}
+					}
+				}
 			}
 		}
 	}
