@@ -964,7 +964,114 @@ void Evento(HEX Pos, Jogador jogador)
 		}
 	}
 }
+void SistemaBatalha(Unidade exercito, HEX hex)
+{
+	int dado;
 
+	Unidade inimigo = (Unidade)malloc(sizeof(struct unidade));
+	srand(time(NULL));
+	dado = (rand() % 6 + 1);
+	inimigo->Tipo = rand() % 4;
+	inimigo->Nivel = exercito->Nivel + (rand() % 4 - 2);
+
+	inimigo->Comida_Necessaria = (inimigo->Nivel * 2);
+
+	if (hex->Tipo_de_Terreno == 0)
+	{
+		if (exercito->Tipo == 1)
+		{
+			dado = dado;
+		}
+		if (exercito->Tipo == 2)
+		{
+			dado = dado / 2;
+		}
+		if (exercito->Tipo == 3)
+		{
+			dado = dado * 2;
+		}
+	}
+
+	if (hex->Tipo_de_Terreno == 1)
+	{
+		if (exercito->Tipo == 1)
+		{
+			dado = dado * 2;
+		}
+		if (exercito->Tipo == 2)
+		{
+			dado = dado;
+		}
+		if (exercito->Tipo == 3)
+		{
+			dado = dado;
+		}
+	}
+
+	if (hex->Tipo_de_Terreno == 2)
+	{
+		if (exercito->Tipo == 1)
+		{
+			dado = dado / 2;
+		}
+		if (exercito->Tipo == 2)
+		{
+			dado = dado;
+		}
+		if (exercito->Tipo)
+		{
+			dado = dado / 2;
+		}
+	}
+	//0-Floresta/Campo Normal 1-Tundra Gelada 2-Deserto
+	// 1 - infataria, 2- arqueiros 3 - cavalaria;
+
+	if (hex->Tipo_de_Bioma == 0)
+	{
+		if (exercito->Tipo == 1)
+		{
+			dado = dado * 2;
+		}
+		if (exercito->Tipo == 2)
+		{
+			dado = dado * 2;
+		}
+		if (exercito->Tipo == 3)
+		{
+			dado = dado * 2;
+		}
+
+		if (hex->Tipo_de_Bioma == 1)
+		{
+			if (exercito->Tipo == 1)
+			{
+				dado = dado;
+			}
+			if (exercito->Tipo == 2)
+			{
+				dado = dado / 2;
+			}
+			if (exercito->Tipo == 3)
+			{
+				dado = dado;
+			}
+		}
+		if (hex->Tipo_de_Bioma == 2)
+		{
+			if (exercito->Tipo == 1)
+			{
+				dado = dado / 2;
+			}
+			if (exercito->Tipo == 2)
+			{
+				dado = dado;
+			}
+			if (exercito->Tipo == 3)
+			{
+				dado = dado / 2;
+			}
+		}
+	}
 void main()
 {
 	Jogador j = NULL;
