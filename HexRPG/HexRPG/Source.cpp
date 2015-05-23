@@ -969,7 +969,7 @@ void SistemaBatalha(Unidade exercito, HEX hex)
 	int dado;
 
 	Unidade inimigo = (Unidade)malloc(sizeof(struct unidade));
-	srand(time(NULL));
+	srand((unsigned)time(NULL));
 	dado = (rand() % 6 + 1);
 	inimigo->Tipo = rand() % 4;
 	inimigo->Nivel = exercito->Nivel + (rand() % 4 - 2);
