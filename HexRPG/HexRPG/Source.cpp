@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
-#include <stdint.h>
-#include <inttypes.h>
+
 #include <time.h>
 
 typedef struct hexagono
@@ -62,6 +61,7 @@ int Comida_Necessaria(Unidade exercito)
 	while (aux != NULL)
 	{
 		comida = comida + (aux->Comida_Necessaria);
+		aux = aux->Prox;
 	}
 	return comida;
 }
@@ -928,22 +928,24 @@ HEX Movimento(HEX Jogador)
 
 void Evento(HEX Pos, Jogador jogador)
 {
+	system("cls");
 	if (Pos->Acampamento == 1)
 	{
 		if (Pos->Facção == 0)
 		{
-			int tipo_de_recrutas,decisao3;
+			int tipo_de_recrutas=0,decisao3;
 			printf("Encontrou um acampamento aliado!\n");
-			tipo_de_recrutas = (int)(rand() % 3);
-			printf("%d",tipo_de_recrutas);
+			tipo_de_recrutas = rand() % 3;
+			printf("%d\n",tipo_de_recrutas);
+			tipo_de_recrutas = 0;
 			switch (tipo_de_recrutas)
 			{
 			case 0:
-				printf("Uma dezena de soldados de Infantaria deseja-se alistar.\nDeseja Contratar(Comida necessaria por movimento: %d, tem:%d)?\n1-Sim\n2-Nao\n",(Comida_Necessaria(jogador->Exercito))+1,jogador->Comida);
+				printf("Uma dezena de soldados de Infantaria deseja-se alistar.\nDeseja Contratar(Comida necessaria por movimento: %d, tem:%d)?\n1-Sim\n2-Nao\n", (Comida_Necessaria(jogador->Exercito)) + 1, jogador->Comida);
 				scanf("%d", &decisao3);
 				if (decisao3 == 1)
 				{
-					//system("cls");
+					system("cls");
 					printf("O jogador aceita os soldados de Infantaria para o seu exercito.\nToda a ajuda e necessaria.\n");
 					jogador->Exercito = Adicionar_ou_Melhorar_Unidade(jogador->Exercito, tipo_de_recrutas);
 				}
@@ -954,7 +956,7 @@ void Evento(HEX Pos, Jogador jogador)
 				scanf("%d", &decisao3);
 				if (decisao3 == 1)
 				{
-					//system("cls");
+					system("cls");
 					printf("O jogador aceita os Arqueiros para o seu exercito.\nToda a ajuda e necessaria.\n");
 					jogador->Exercito = Adicionar_ou_Melhorar_Unidade(jogador->Exercito, tipo_de_recrutas);
 				}
@@ -965,14 +967,11 @@ void Evento(HEX Pos, Jogador jogador)
 				scanf("%d", &decisao3);
 				if (decisao3 == 1)
 				{
-					//system("cls");
+					system("cls");
 					printf("O jogador aceita os Cavaleiros para o seu exercito.\nToda a ajuda e necessaria.\n");
 					jogador->Exercito = Adicionar_ou_Melhorar_Unidade(jogador->Exercito, tipo_de_recrutas);
 				}
 				printf("O jogador abandona o acampamento.\n");
-				break;
-			default:
-				printf("O FDP FOI PARA O DEFAULT\n");
 				break;
 			}
 		}
@@ -993,7 +992,7 @@ void Evento(HEX Pos, Jogador jogador)
 				system("pause");
 				while (decisao3 != 3)
 				{
-					//system("cls");
+					system("cls");
 					printf("O que deseja fazer?\n1-Comprar Comida\n2-Recrutar aldeões\n3-Ir Embora\n");
 					scanf("%d", &decisao3);
 					if (decisao3 == 1)
@@ -1022,13 +1021,13 @@ void Evento(HEX Pos, Jogador jogador)
 				system("pause");
 				while (decisao3!=3)
 				{
-					//system("cls");
+					system("cls");
 					printf("O que deseja fazer?\n1-Comprar Comida\n2-Saquear\n3-Abandonar");
 					scanf("%d",&decisao3);
 					if (decisao3 == 1)
 					{
 						int quant = 0;
-						//system("cls");
+						system("cls");
 						printf("1 de Comida=2 de Ouro\nQuanta Comida deseja comprar?\n");
 							printf("Insira a quantidade de comida a comprar.\n");
 							scanf("%d", &quant);
@@ -1051,7 +1050,7 @@ void Evento(HEX Pos, Jogador jogador)
 							break;
 						case 1:
 							printf("...e conseguem!\n As tropas chegam para a batalha!\n");
-							//BATALHA
+							//PORRADA!!!
 							break;
 						}
 					}
@@ -1064,10 +1063,12 @@ void Evento(HEX Pos, Jogador jogador)
 			{
 				printf("O jogador chegou a uma cidade capital.\n");
 				system("pause");
-				printf("BYE, HAVE A GOOD TIME!");
 			}
 			else
-			{ }
+			{
+				printf("O jogador chegou a uma capital inimiga!\n");
+				//PORRADA!!!
+			}
 		}
 	}
 }
@@ -1101,14 +1102,19 @@ void main()
 	Add_Hex(Mapa->NE, 3);
 	Add_Hex(Mapa->NE, 4);
 	
-	Actualizar_Interface(jogador);
+	jogador->Acampamento = 1;
+	jogador->Aldeia = 0;
+	jogador->Capital = 0;
+	jogador->Facção = 0;
 	while (Perdeu==0)
 	{
+		Evento(jogador, j);
+		Actualizar_Interface(jogador);
 		jogador=Movimento(jogador);
 		j->X = jogador->x;
 		j->Y = jogador->y;
-		Actualizar_Ligaçoes(jogador);
 		Actualizar_Interface(jogador);
+		Actualizar_Ligaçoes(jogador);
 	}
 	system("pause");
 	free(j);
