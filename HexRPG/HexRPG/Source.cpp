@@ -398,20 +398,20 @@ void Actualizar_Interface(HEX Mapa)
 	switch (aux->Acampamento)
 	{
 	case 0:
-		printf("0-Tem acampamento.\n");
+		printf("Encontrou um acampamento!\n");
 		break;
 	case 1:
-		printf("1-Nao tem acampamento.\n");
+		printf("Nao tem acampamento.\n");
 	default:
 		break;
 	}
 	switch (aux->Aldeia)
 	{
 	case 0:
-		printf("0-Nao tem aldeia.\n");
+		printf("Nao tem aldeia.\n");
 		break;
 	case 1:
-		printf("1-Tem aldeia.\n");
+		printf("Tem aldeia.\n");
 		break;
 	default:
 		break;
@@ -419,36 +419,36 @@ void Actualizar_Interface(HEX Mapa)
 	switch (aux->Facção)
 	{
 	case 0:
-		printf("0-Aliados\n");
+		printf("Aliados\n");
 		break;
 	case 1:
-		printf("1-Inimigos\n");
+		printf("Inimigos\n");
 		break;
 	default:
-		printf("O FDP VAI PARA DEFAULT!\n");
+		printf("VAI PARA DEFAULT!\n");
 		break;
 	}
 	switch (aux->Tipo_de_Terreno)
 	{
 	case 0:
-		printf("0-Planície\n");
+		printf("Planície\n");
 		break;
 	case 1:
-		printf("1-Floresta\n");
+		printf("Floresta\n");
 		break;
 	case 2:
-		printf("2-Montanha\n");
+		printf("Montanha\n");
 	}
 	switch (aux->Tipo_de_Bioma)
 	{
 	case 0:
-		printf("0-Normal\n");
+		printf("Normal\n");
 		break;
 	case 1:
-		printf("1-Tundra\n");
+		printf("Tundra\n");
 		break;
 	case 2:
-		printf("2-Deserto\n");
+		printf("Deserto\n");
 		break;
 	default:
 		break;
@@ -859,7 +859,8 @@ Jogador Iniciar_Jogador(Jogador j)
 void Main_Menu()
 {
 	char a;
-	printf("=================================================================================                                   HEX RPG                                    =================================================================================\n1-Comecar\n2-Continuar\n3-Sair\n");
+	printf("=================================================================================                                   HEX RPG                                    =================================================================================");
+	printf("\n \n Bem vindo ao HEX RPG! \n Ande pelo mapa! \n Recrute tropas! \n Combata contra os seus inimigos! \n Conquiste-os!!  \n\n1-Comecar\n2-Continuar\n3-Sair\n");
 	while (!_kbhit())
 	{}
 	switch (_getch())
@@ -875,6 +876,7 @@ void Main_Menu()
 	case 51:
 		system("cls");
 		printf("Acabar Jogo\n");
+		exit(0);
 	}
 }
 
@@ -1075,6 +1077,8 @@ void Evento(HEX Pos, Jogador jogador)
 
 void main()
 {
+	Main_Menu();
+	
 	Jogador j = NULL;
 	j = (Jogador)malloc(sizeof(struct jogador));
 	j = Iniciar_Jogador(j);
