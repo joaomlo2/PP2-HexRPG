@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include <time.h>
 
 typedef struct hexagono
@@ -36,6 +38,7 @@ typedef struct jogador
 	int X;
 	int Y;
 	struct unidade*Exercito;
+	struct jogador*Prox;
 }*Jogador;
 
 //Funções para as estruturas das unidades
@@ -363,6 +366,7 @@ void Actualizar_Interface(HEX Mapa)
 		printf("Essa Celula nao existe!");
 	else
 	{
+		printf("MAPA:\n");
 		if (aux->N != NULL)
 			printf("    %d,%d\n", aux->N->x, aux->N->y);
 		else
@@ -391,11 +395,64 @@ void Actualizar_Interface(HEX Mapa)
 	}
 	printf("Este Hexagono encontra-se nas coordenadas (%d,%d).\n",Mapa->x,Mapa->y);
 	Movimentos_Possiveis(Mapa);
-	printf("%d\n", aux->Acampamento);
-	printf("%d\n", aux->Aldeia);
-	printf("%d\n", aux->Facção);
-	printf("%d\n", aux->Tipo_de_Bioma);
-	printf("%d\n", aux->Tipo_de_Terreno);
+	switch (aux->Acampamento)
+	{
+	case 0:
+		printf("0-Tem acampamento.\n");
+		break;
+	case 1:
+		printf("1-Nao tem acampamento.\n");
+	default:
+		break;
+	}
+	switch (aux->Aldeia)
+	{
+	case 0:
+		printf("0-Nao tem aldeia.\n");
+		break;
+	case 1:
+		printf("1-Tem aldeia.\n");
+		break;
+	default:
+		break;
+	}
+	switch (aux->Facção)
+	{
+	case 0:
+		printf("0-Aliados\n");
+		break;
+	case 1:
+		printf("1-Inimigos\n");
+		break;
+	default:
+		printf("O FDP VAI PARA DEFAULT!\n");
+		break;
+	}
+	switch (aux->Tipo_de_Terreno)
+	{
+	case 0:
+		printf("0-Planície\n");
+		break;
+	case 1:
+		printf("1-Floresta\n");
+		break;
+	case 2:
+		printf("2-Montanha\n");
+	}
+	switch (aux->Tipo_de_Bioma)
+	{
+	case 0:
+		printf("0-Normal\n");
+		break;
+	case 1:
+		printf("1-Tundra\n");
+		break;
+	case 2:
+		printf("2-Deserto\n");
+		break;
+	default:
+		break;
+	}
 }
 
 void Actualizar_Ligaçoes(HEX Centro)
@@ -525,7 +582,6 @@ void Add_Hex(HEX apt,int dir)
 	{
 		if (aux->NO == NULL)
 		{
-			srand((time(NULL))*(time(NULL)));
 			aux = aux->NO;
 			aux = (HEX)malloc(sizeof(struct hexagono));
 			aux->x=(apt->x) - 1;
@@ -536,13 +592,13 @@ void Add_Hex(HEX apt,int dir)
 			aux->S = NULL;
 			aux->NE = NULL;
 			aux->Acampamento = rand() % 2;
-			aux->Facção = rand() % 3;
+			aux->Facção = rand() % 2;
 			if (aux->Acampamento = 1)
 				aux->Aldeia = 0;
 			else
 				aux->Aldeia = rand() % 2;
-			aux->Tipo_de_Bioma = rand() % 4;
-			aux->Tipo_de_Terreno = rand() % 4;
+			aux->Tipo_de_Bioma = rand() % 3;
+			aux->Tipo_de_Terreno = rand() % 3;
 			apt->NO = aux;
 			aux->SE = apt;
 		}
@@ -555,7 +611,6 @@ void Add_Hex(HEX apt,int dir)
 	{
 		if (aux->N == NULL)
 		{
-			srand(sqrt(time(NULL)));
 			aux = aux->N;
 			aux = (HEX)malloc(sizeof(struct hexagono));
 			aux->x = apt->x;
@@ -566,13 +621,13 @@ void Add_Hex(HEX apt,int dir)
 			aux->SE = NULL;
 			aux->SO = NULL;
 			aux->Acampamento = rand() % 2;
-			aux->Facção = rand() % 3;
+			aux->Facção = rand() % 2;
 			if (aux->Acampamento = 1)
 				aux->Aldeia = 0;
 			else
 				aux->Aldeia = rand() % 2;
-			aux->Tipo_de_Bioma = rand() % 4;
-			aux->Tipo_de_Terreno = rand() % 4;
+			aux->Tipo_de_Bioma = rand() % 3;
+			aux->Tipo_de_Terreno = rand() % 3;
 			apt->N = aux;
 			aux->S = apt;
 		}
@@ -585,7 +640,6 @@ void Add_Hex(HEX apt,int dir)
 	{
 		if (aux->NE == NULL)
 		{
-			srand((time(NULL))*4);
 			aux = aux->NE;
 			aux = (HEX)malloc(sizeof(struct hexagono));
 			aux->x = (apt->x) + 1;
@@ -596,13 +650,13 @@ void Add_Hex(HEX apt,int dir)
 			aux->S = NULL;
 			aux->NO = NULL;
 			aux->Acampamento = rand() % 2;
-			aux->Facção = rand() % 3;
+			aux->Facção = rand() % 2;
 			if (aux->Acampamento = 1)
 				aux->Aldeia = 0;
 			else
 				aux->Aldeia = rand() % 2;
-			aux->Tipo_de_Bioma = rand() % 4;
-			aux->Tipo_de_Terreno = rand() % 4;
+			aux->Tipo_de_Bioma = rand() % 3;
+			aux->Tipo_de_Terreno = rand() % 3;
 			apt->NE = aux;
 			aux->SO = apt;
 		}
@@ -615,7 +669,6 @@ void Add_Hex(HEX apt,int dir)
 	{
 		if (aux->SE == NULL)
 		{
-			srand(sqrt(time(NULL))*6);
 			aux = aux->SE;
 			aux = (HEX)malloc(sizeof(struct hexagono));
 			aux->x = (apt->x) + 1;
@@ -626,13 +679,13 @@ void Add_Hex(HEX apt,int dir)
 			aux->SO = NULL;
 			aux->NE = NULL;
 			aux->Acampamento = rand() % 2;
-			aux->Facção = rand() % 3;
+			aux->Facção = rand() % 2;
 			if (aux->Acampamento = 1)
 				aux->Aldeia = 0;
 			else
 				aux->Aldeia = rand() % 2;
-			aux->Tipo_de_Bioma = rand() % 4;
-			aux->Tipo_de_Terreno = rand() % 4;
+			aux->Tipo_de_Bioma = rand() % 3;
+			aux->Tipo_de_Terreno = rand() % 3;
 			apt->SE = aux;
 			aux->NO = apt;
 		}
@@ -645,7 +698,6 @@ void Add_Hex(HEX apt,int dir)
 	{
 		if (aux->S == NULL)
 		{
-			srand(sqrt(time(NULL)));
 			aux = aux->S;
 			aux = (HEX)malloc(sizeof(struct hexagono));
 			aux->x = (apt->x);
@@ -656,13 +708,13 @@ void Add_Hex(HEX apt,int dir)
 			aux->SO = NULL;
 			aux->NE = NULL;
 			aux->Acampamento = rand() % 2;
-			aux->Facção = rand() % 3;
+			aux->Facção = rand() % 2;
 			if (aux->Acampamento = 1)
 				aux->Aldeia = 0;
 			else
 				aux->Aldeia = rand() % 2;
-			aux->Tipo_de_Bioma = rand() % 4;
-			aux->Tipo_de_Terreno = rand() % 4;
+			aux->Tipo_de_Bioma = rand() % 3;
+			aux->Tipo_de_Terreno = rand() % 3;
 			apt->S = aux;
 			aux->N = apt;
 		}
@@ -675,7 +727,6 @@ void Add_Hex(HEX apt,int dir)
 	{
 		if (aux->SO == NULL)
 		{
-			srand(sqrt(time(NULL)));
 			aux = aux->SO;
 			aux = (HEX)malloc(sizeof(struct hexagono));
 			aux->x = (apt->x) - 1;
@@ -686,13 +737,13 @@ void Add_Hex(HEX apt,int dir)
 			aux->SO = NULL;
 			aux->NO = NULL;
 			aux->Acampamento = rand() % 2;
-			aux->Facção = rand() % 3;
+			aux->Facção = rand() % 2;
 			if (aux->Acampamento = 1)
 				aux->Aldeia = 0;
 			else
 				aux->Aldeia = rand() % 2;
-			aux->Tipo_de_Bioma = rand() % 4;
-			aux->Tipo_de_Terreno = rand() % 4;
+			aux->Tipo_de_Bioma = rand() % 3;
+			aux->Tipo_de_Terreno = rand() % 3;
 			apt->SO = aux;
 			aux->NE = apt;
 		}
@@ -882,43 +933,46 @@ void Evento(HEX Pos, Jogador jogador)
 		if (Pos->Facção == 0)
 		{
 			int tipo_de_recrutas,decisao3;
-			srand(time(NULL));
 			printf("Encontrou um acampamento aliado!\n");
-			tipo_de_recrutas = rand() % 3;
+			tipo_de_recrutas = (int)(rand() % 3);
+			printf("%d",tipo_de_recrutas);
 			switch (tipo_de_recrutas)
 			{
 			case 0:
-				printf("Uma dezena de soldados de Infantaria deseja-se alistar.\nDeseja Contratar(Comida necessaria por movimento: %d, tem:%d)?\n1-Sim\n2-Nao\n",(jogador->Exercito)+1,jogador->Comida);
+				printf("Uma dezena de soldados de Infantaria deseja-se alistar.\nDeseja Contratar(Comida necessaria por movimento: %d, tem:%d)?\n1-Sim\n2-Nao\n",(Comida_Necessaria(jogador->Exercito))+1,jogador->Comida);
 				scanf("%d", &decisao3);
 				if (decisao3 == 1)
 				{
-					system("cls");
+					//system("cls");
 					printf("O jogador aceita os soldados de Infantaria para o seu exercito.\nToda a ajuda e necessaria.\n");
 					jogador->Exercito = Adicionar_ou_Melhorar_Unidade(jogador->Exercito, tipo_de_recrutas);
 				}
 				printf("O jogador abandona o acampamento.\n");
 				break;
 			case 1:
-				printf("Uma dezena de Arqueiros deseja-se alistar.\nDeseja Contratar(Comida necessaria por movimento: %d, tem:%d)?\n1-Sim\n2-Nao\n", (jogador->Exercito) + 1, jogador->Comida);
+				printf("Uma dezena de Arqueiros deseja-se alistar.\nDeseja Contratar(Comida necessaria por movimento: %d, tem:%d)?\n1-Sim\n2-Nao\n", Comida_Necessaria(jogador->Exercito) + 1, jogador->Comida);
 				scanf("%d", &decisao3);
 				if (decisao3 == 1)
 				{
-					system("cls");
+					//system("cls");
 					printf("O jogador aceita os Arqueiros para o seu exercito.\nToda a ajuda e necessaria.\n");
 					jogador->Exercito = Adicionar_ou_Melhorar_Unidade(jogador->Exercito, tipo_de_recrutas);
 				}
 				printf("O jogador abandona o acampamento.\n");
 				break;
 			case 2:
-				printf("Uma dezena de Cavaleiros deseja-se alistar.\nDeseja Contratar(Comida necessaria por movimento: %d, tem:%d)?\n1-Sim\n2-Nao\n", (jogador->Exercito) + 1, jogador->Comida);
+				printf("Uma dezena de Cavaleiros deseja-se alistar.\nDeseja Contratar(Comida necessaria por movimento: %d, tem:%d)?\n1-Sim\n2-Nao\n", Comida_Necessaria(jogador->Exercito) + 1, jogador->Comida);
 				scanf("%d", &decisao3);
 				if (decisao3 == 1)
 				{
-					system("cls");
+					//system("cls");
 					printf("O jogador aceita os Cavaleiros para o seu exercito.\nToda a ajuda e necessaria.\n");
 					jogador->Exercito = Adicionar_ou_Melhorar_Unidade(jogador->Exercito, tipo_de_recrutas);
 				}
 				printf("O jogador abandona o acampamento.\n");
+				break;
+			default:
+				printf("O FDP FOI PARA O DEFAULT\n");
 				break;
 			}
 		}
@@ -939,7 +993,7 @@ void Evento(HEX Pos, Jogador jogador)
 				system("pause");
 				while (decisao3 != 3)
 				{
-					system("cls");
+					//system("cls");
 					printf("O que deseja fazer?\n1-Comprar Comida\n2-Recrutar aldeões\n3-Ir Embora\n");
 					scanf("%d", &decisao3);
 					if (decisao3 == 1)
@@ -961,6 +1015,59 @@ void Evento(HEX Pos, Jogador jogador)
 					}
 				}
 			}
+			else
+			{
+				int decisao3=0;
+				printf("O jogador encontrou uma aldeia inimiga!\nOs habitantes nao estao muito contentes.\n");
+				system("pause");
+				while (decisao3!=3)
+				{
+					//system("cls");
+					printf("O que deseja fazer?\n1-Comprar Comida\n2-Saquear\n3-Abandonar");
+					scanf("%d",&decisao3);
+					if (decisao3 == 1)
+					{
+						int quant = 0;
+						//system("cls");
+						printf("1 de Comida=2 de Ouro\nQuanta Comida deseja comprar?\n");
+							printf("Insira a quantidade de comida a comprar.\n");
+							scanf("%d", &quant);
+							if ((quant * 2) >= jogador->Ouro||quant<0)
+								printf("Essa quantidade nao e valida!\n");
+							else
+							{
+								jogador->Comida = (jogador->Comida) + quant;
+								jogador->Ouro = (jogador->Ouro) - (quant * 2);
+								printf("Comprou %d de Comida por %d de Ouro!\n",quant,quant*2);
+							}
+					}
+					else
+					{
+						printf("O jogador decide saquear a aldeia!\n Os aldeoes tentam avisar tropas inimigas...\n");
+						switch (rand()%2)
+						{
+						case 0:
+							printf("...mas nao conseguem ir a tempo.\n");
+							break;
+						case 1:
+							printf("...e conseguem!\n As tropas chegam para a batalha!\n");
+							//BATALHA
+							break;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if (Pos->Facção == 0)
+			{
+				printf("O jogador chegou a uma cidade capital.\n");
+				system("pause");
+				printf("BYE, HAVE A GOOD TIME!");
+			}
+			else
+			{ }
 		}
 	}
 }
@@ -970,11 +1077,11 @@ void main()
 	Jogador j = NULL;
 	j = (Jogador)malloc(sizeof(struct jogador));
 	j = Iniciar_Jogador(j);
-	srand(time(NULL));
+	srand((unsigned)time(NULL));
 	int Perdeu = 0;
-	HEX Mapa = NULL,Jogador;
+	HEX Mapa = NULL,jogador;
 	Mapa = Inicializar(Mapa);
-	Jogador = Mapa;
+	jogador = Mapa;
 	Add_Hex(Mapa, 1);
 	Add_Hex(Mapa, 2);
 	Add_Hex(Mapa, 3);
@@ -993,16 +1100,16 @@ void main()
 	Add_Hex(Mapa->SE, 4);
 	Add_Hex(Mapa->NE, 3);
 	Add_Hex(Mapa->NE, 4);
-	Actualizar_Interface(Jogador);
+	
+	Actualizar_Interface(jogador);
 	while (Perdeu==0)
 	{
-		Jogador=Movimento(Jogador);
-		j->X = Jogador->x;
-		j->Y = Jogador->y;
-		Actualizar_Ligaçoes(Jogador);
-		Actualizar_Interface(Jogador);
+		jogador=Movimento(jogador);
+		j->X = jogador->x;
+		j->Y = jogador->y;
+		Actualizar_Ligaçoes(jogador);
+		Actualizar_Interface(jogador);
 	}
 	system("pause");
 	free(j);
-	free(Mapa);
 }
