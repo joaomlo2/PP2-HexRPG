@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
-
 #include <time.h>
 
 typedef struct hexagono
@@ -36,6 +35,7 @@ typedef struct jogador
 	int Comida;
 	int X;
 	int Y;
+	int Capitais_Conquistadas;
 	struct unidade*Exercito;
 	struct jogador*Prox;
 }*Jogador;
@@ -48,8 +48,21 @@ void Print_Exercito(Unidade exercito)
 	int i = 1;
 	while (aux != NULL)
 	{
-		printf("\n%d-\nNivel:%d\nTipo:%d\nSustento Necessario:%d\n", i, aux->Nivel, aux->Tipo,aux->Comida_Necessaria);
+		printf("\nPosicao %d-\nNivel:%d\nTipo:%d\nSustento Necessario:%d\n\n", i, aux->Nivel, aux->Tipo,aux->Comida_Necessaria);
 		i++;
+		aux = aux->Prox;
+	}
+}
+
+void Fome(Unidade exercito)
+{
+	Unidade aux=exercito;
+	while (aux != NULL)
+	{
+		if (exercito->Nivel > 0)
+		{
+			exercito->Nivel--;
+		}
 		aux = aux->Prox;
 	}
 }
@@ -70,17 +83,17 @@ Unidade Iniciar_Exercito(Unidade jogador)
 {
 	Unidade aux = jogador;
 	jogador->Nivel = 0;
-	jogador->Tipo = 0;
+	jogador->Tipo = -1;
 	jogador->Comida_Necessaria = 0;
 	jogador->Prox = (Unidade)malloc(sizeof(struct unidade));
 	aux = aux->Prox;
 	aux->Nivel = 0;
-	aux->Tipo = 0;
+	aux->Tipo = -1;
 	aux->Comida_Necessaria = 0;
 	aux->Prox = (Unidade)malloc(sizeof(struct unidade));
 	aux = aux->Prox;
 	aux->Nivel = 0;
-	aux->Tipo = 0;
+	aux->Tipo = -1;
 	aux->Comida_Necessaria = 0;
 	aux->Prox = NULL;
 	return jogador;
@@ -103,7 +116,7 @@ int Ja_Tem_Unidades_Desse_Tipo(Unidade exercito,int tipo)
 
 Unidade Adicionar_ou_Melhorar_Unidade(Unidade exercito,int tipo)
 {
-	if (exercito == 0)
+	if (exercito->Tipo == -1)
 	{
 		exercito->Tipo = tipo;
 		exercito->Nivel = 1;
@@ -118,20 +131,20 @@ Unidade Adicionar_ou_Melhorar_Unidade(Unidade exercito,int tipo)
 			{
 				aux = aux->Prox;
 			}
-			aux->Nivel++;
+			aux->Nivel+=10;
 			aux->Comida_Necessaria++;
 			return exercito;
 		}
 		else
 		{
 			Unidade aux = exercito;
-			while (aux->Nivel != 0 && aux->Tipo != 0 && aux != NULL)
+			while (aux->Nivel != -1 && aux->Tipo != -1 && aux != NULL)
 			{
 				aux = aux->Prox;
 			}
-			aux->Nivel = 1;
+			aux->Nivel = 10;
 			aux->Tipo = tipo;
-			exercito->Comida_Necessaria++;
+			exercito->Comida_Necessaria=1;
 		}
 	}
 	return exercito;
@@ -279,55 +292,6 @@ Unidade Reorganizar_Exercito(Unidade exercito)
 
 //Funções para células HEX
 
-int Encontrou_Celula(HEX apt, int X, int Y)
-{
-	if (apt->x == X&&apt->y == Y)
-		return 1;
-	else
-		return 0;
-}
-
-HEX Encontrar_Celula(HEX Mapa, int X, int Y)
-{
-	if (Mapa == NULL)
-	{
-		return NULL;
-	}
-	else
-	{
-		if (Encontrou_Celula(Mapa, X, Y) == 1)
-		{
-			return Mapa;
-		}
-		else
-		{
-			if (Mapa->N != NULL)
-			{
-				Encontrar_Celula(Mapa->N, X, Y);
-			}
-			if (Mapa->NE != NULL)
-			{
-				Encontrar_Celula(Mapa->NE, X, Y);
-			}
-			if (Mapa->NO != NULL)
-			{
-				Encontrar_Celula(Mapa->NO, X, Y);
-			}
-			if (Mapa->S != NULL)
-			{
-				Encontrar_Celula(Mapa->S, X, Y);
-			}
-			if (Mapa->SE != NULL)
-			{
-				Encontrar_Celula(Mapa->SE, X, Y);
-			}
-			if (Mapa->SO != NULL)
-			{
-				Encontrar_Celula(Mapa->SO, X, Y);
-			}
-		}
-	}
-}
 
 void Movimentos_Possiveis(HEX Jogador)
 {
@@ -358,43 +322,53 @@ void Movimentos_Possiveis(HEX Jogador)
 		printf("    #    \n");
 }
 
-void Actualizar_Interface(HEX Mapa)
+void Actualizar_Interface(HEX Mapa,Jogador j)
 {
 	system("cls");
 	HEX aux = Mapa;
+	printf_s("================= MAPA ==================\n");
 	if (aux == NULL)
 		printf("Essa Celula nao existe!");
 	else
 	{
-		printf("MAPA:\n");
+		/* N - Norte */
 		if (aux->N != NULL)
-			printf("    %d,%d\n", aux->N->x, aux->N->y);
-		else
-			printf("    NOPE\n");
+		{
+			printf_s("       _____\n");
+			printf_s(" _____/%2d,%2d\\_____\n", aux->N->x, aux->N->y);
+		}
+		else printf("    NOPE\n");
+		/* NO - Noroeste */
 		if (aux->NO != NULL)
-			printf("%d,%d	", aux->NO->x, aux->NO->y);
-		else
-			printf("NOPE	");
+			printf_s("/%2d,%2d\\", aux->NO->x, aux->NO->y);
+		else printf("NOPE	");
+		/* NE - Nordeste */
 		if (aux->NE != NULL)
-			printf("%d,%d\n", aux->NE->x, aux->NE->y);
-		else
-			printf("NOPE\n");
-		printf("    %d,%d    	\n", aux->x, aux->y);
+			printf("_____/%2d,%2d\\\n", aux->NE->x, aux->NE->y);
+		else printf("NOPE\n");
+
+		/* Centro */
+		printf("\\_____/%2d,%2d\\_____/\n", aux->x, aux->y);
+
+		/* SO - Sudoeste */
 		if (aux->SO != NULL)
-			printf("%d,%d     ",aux->SO->x, aux->SO->y);
-		else
-			printf("NOPE	");
+			printf("/%2d,%2d\\", aux->SO->x, aux->SO->y);
+		else printf("NOPE	");
+		/* SE - Sudeste */
 		if (aux->SE != NULL)
-			printf("%d,%d\n", aux->SE->x, aux->SE->y);
-		else
-			printf("NOPE\n");
+			printf("_____/%2d,%2d\\\n", aux->SE->x, aux->SE->y);
+		else printf("NOPE\n");
+		/* S - Sul */
 		if (aux->S != NULL)
-			printf("    %d,%d\n", aux->S->x, aux->S->y);
-		else
-			printf("    NOPE\n\n");
+		{
+			printf("\\_____/%2d,%2d\\_____/\n", aux->S->x, aux->S->y);
+			printf_s("      \\_____/\n");
+		}
+		else printf("    NOPE\n\n");
 	}
-	printf("Este Hexagono encontra-se nas coordenadas (%d,%d).\n",Mapa->x,Mapa->y);
-	Movimentos_Possiveis(Mapa);
+	printf("Voce encontra-se nas coordenadas (%d,%d).\n\n", Mapa->x, Mapa->y);
+
+	printf_s("====== Atributos de <%d, %d> ======\n", Mapa->x, Mapa->y);
 	switch (aux->Acampamento)
 	{
 	case 0:
@@ -453,6 +427,10 @@ void Actualizar_Interface(HEX Mapa)
 	default:
 		break;
 	}
+	printf_s("=========================================\nOURO:%d	COMIDA:%d\n",j->Ouro,j->Comida);
+	printf_s("=========================================\n\n");
+
+	Movimentos_Possiveis(Mapa);
 }
 
 void Actualizar_Ligaçoes(HEX Centro)
@@ -571,7 +549,7 @@ HEX Inicializar(HEX Mapa)
 	}
 }
 
-void Add_Hex(HEX apt,int dir)
+void Add_Hex(HEX apt,int dir,int ncapitais)
 {
 	HEX aux = apt;
 	if (apt == NULL)
@@ -594,9 +572,26 @@ void Add_Hex(HEX apt,int dir)
 			aux->Acampamento = rand() % 2;
 			aux->Facção = rand() % 2;
 			if (aux->Acampamento = 1)
+			{
 				aux->Aldeia = 0;
+				aux->Capital = 0;
+			}
 			else
+			{
 				aux->Aldeia = rand() % 2;
+				if (aux->Aldeia == 1)
+				{
+					aux->Capital = 0;
+				}
+				else
+				{
+					if (ncapitais < 6)
+					{
+						aux->Capital = 1;
+						ncapitais++;
+					}
+				}
+			}
 			aux->Tipo_de_Bioma = rand() % 3;
 			aux->Tipo_de_Terreno = rand() % 3;
 			apt->NO = aux;
@@ -623,9 +618,26 @@ void Add_Hex(HEX apt,int dir)
 			aux->Acampamento = rand() % 2;
 			aux->Facção = rand() % 2;
 			if (aux->Acampamento = 1)
+			{
 				aux->Aldeia = 0;
+				aux->Capital = 0;
+			}
 			else
+			{
 				aux->Aldeia = rand() % 2;
+				if (aux->Aldeia == 1)
+				{
+					aux->Capital = 0;
+				}
+				else
+				{
+					if (ncapitais < 6)
+					{
+						aux->Capital = 1;
+						ncapitais++;
+					}
+				}
+			}
 			aux->Tipo_de_Bioma = rand() % 3;
 			aux->Tipo_de_Terreno = rand() % 3;
 			apt->N = aux;
@@ -652,9 +664,26 @@ void Add_Hex(HEX apt,int dir)
 			aux->Acampamento = rand() % 2;
 			aux->Facção = rand() % 2;
 			if (aux->Acampamento = 1)
+			{
 				aux->Aldeia = 0;
+				aux->Capital = 0;
+			}
 			else
+			{
 				aux->Aldeia = rand() % 2;
+				if (aux->Aldeia == 1)
+				{
+					aux->Capital = 0;
+				}
+				else
+				{
+					if (ncapitais < 6)
+					{
+						aux->Capital = 1;
+						ncapitais++;
+					}
+				}
+			}
 			aux->Tipo_de_Bioma = rand() % 3;
 			aux->Tipo_de_Terreno = rand() % 3;
 			apt->NE = aux;
@@ -681,9 +710,26 @@ void Add_Hex(HEX apt,int dir)
 			aux->Acampamento = rand() % 2;
 			aux->Facção = rand() % 2;
 			if (aux->Acampamento = 1)
+			{
 				aux->Aldeia = 0;
+				aux->Capital = 0;
+			}
 			else
+			{
 				aux->Aldeia = rand() % 2;
+				if (aux->Aldeia == 1)
+				{
+					aux->Capital = 0;
+				}
+				else
+				{
+					if (ncapitais < 6)
+					{
+						aux->Capital = 1;
+						ncapitais++;
+					}
+				}
+			}
 			aux->Tipo_de_Bioma = rand() % 3;
 			aux->Tipo_de_Terreno = rand() % 3;
 			apt->SE = aux;
@@ -710,9 +756,26 @@ void Add_Hex(HEX apt,int dir)
 			aux->Acampamento = rand() % 2;
 			aux->Facção = rand() % 2;
 			if (aux->Acampamento = 1)
+			{
 				aux->Aldeia = 0;
+				aux->Capital = 0;
+			}
 			else
+			{
 				aux->Aldeia = rand() % 2;
+				if (aux->Aldeia == 1)
+				{
+					aux->Capital = 0;
+				}
+				else
+				{
+					if (ncapitais < 6)
+					{
+						aux->Capital = 1;
+						ncapitais++;
+					}
+				}
+			}
 			aux->Tipo_de_Bioma = rand() % 3;
 			aux->Tipo_de_Terreno = rand() % 3;
 			apt->S = aux;
@@ -739,9 +802,26 @@ void Add_Hex(HEX apt,int dir)
 			aux->Acampamento = rand() % 2;
 			aux->Facção = rand() % 2;
 			if (aux->Acampamento = 1)
+			{
 				aux->Aldeia = 0;
+				aux->Capital = 0;
+			}
 			else
+			{
 				aux->Aldeia = rand() % 2;
+				if (aux->Aldeia == 1)
+				{
+					aux->Capital = 0;
+				}
+				else
+				{
+					if (ncapitais < 6)
+					{
+						aux->Capital = 1;
+						ncapitais++;
+					}
+				}
+			}
 			aux->Tipo_de_Bioma = rand() % 3;
 			aux->Tipo_de_Terreno = rand() % 3;
 			apt->SO = aux;
@@ -849,6 +929,8 @@ Jogador Iniciar_Jogador(Jogador j)
 {
 	j->Ouro = 50;
 	j->Comida = 50;
+	j->Capitais_Conquistadas = 0;
+	j->Prox = NULL;
 	j->Exercito = (Unidade)malloc(sizeof(struct unidade));
 	j->Exercito=Iniciar_Exercito(j->Exercito);
 	return j;
@@ -860,9 +942,10 @@ void Main_Menu()
 {
 	char a;
 	printf("=================================================================================                                   HEX RPG                                    =================================================================================");
-	printf("\n \n Bem vindo ao HEX RPG! \n Ande pelo mapa! \n Recrute tropas! \n Combata contra os seus inimigos! \n Conquiste-os!!  \n\n1-Comecar\n2-Continuar\n3-Sair\n");
+	printf("\n \n Bem vindo ao HEX RPG! \n Ande pelo mapa! \n Recrute tropas! \n Combata contra os seus inimigos! \n Conquiste-os!!  \n\n1-Comecar\n2-Sair\n");
 	while (!_kbhit())
-	{}
+	{
+	}
 	switch (_getch())
 	{
 	case 49:
@@ -870,10 +953,6 @@ void Main_Menu()
 		printf("Novo Jogo\n");
 		break;
 	case 50:
-		system("cls");
-		printf("Continuar Jogo\n");
-		break;
-	case 51:
 		system("cls");
 		printf("Acabar Jogo\n");
 		exit(0);
@@ -928,6 +1007,275 @@ HEX Movimento(HEX Jogador)
 	return aux;
 }
 
+int Calcular_Vantagem(HEX pos, int tipo_de_unidade,int nivel)
+{
+	int vantagem = 5;
+	if (pos->Tipo_de_Bioma == 0)
+	{
+		switch (tipo_de_unidade)
+		{
+		case 1:
+			break;
+		case 2:
+			vantagem += 2;
+			break;
+		case 3:
+			vantagem -= 2;
+			break;
+		}
+	}
+	if (pos->Tipo_de_Bioma == 1)
+	{
+		switch (tipo_de_unidade)
+		{
+		case 1:
+			vantagem +=2;
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		}
+	}
+	if (pos->Tipo_de_Bioma == 2)
+	{
+		switch (tipo_de_unidade)
+		{
+		case 1:
+			vantagem -= 2;
+			break;
+		case 2:
+			vantagem += 2;
+			break;
+		case 3:
+			vantagem -= 2;
+			break;
+		}
+	}
+	if (pos->Tipo_de_Terreno == 0)
+	{
+		switch (tipo_de_unidade)
+		{
+		case 1:
+			vantagem += 2;
+			break;
+		case 2:
+			vantagem += 2;
+			break;
+		case 3:
+			vantagem += 2;
+			break;
+		}
+	}
+	if (pos->Tipo_de_Terreno == 1)
+	{
+		switch (tipo_de_unidade)
+		{
+		case 1:
+			break;
+		case 2:
+			vantagem -= 2;
+			break;
+		case 3:
+			break;
+		}
+	}
+	if (pos->Tipo_de_Terreno == 2)
+	{
+		switch (tipo_de_unidade)
+		{
+		case 1:
+			vantagem -= 2;
+			break;
+		case 2:
+			break;
+		case 3:
+			vantagem -= 2;
+			break;
+		}
+	}
+	vantagem = vantagem + nivel;
+	return vantagem;
+}
+
+void Conversao(HEX pos,Jogador j)
+{
+	pos->Facção = 0;
+	j->Ouro += rand()%501;
+	j->Comida += rand() % 101;
+}
+
+int Perdeu_Jogo(Jogador j)
+{
+	int resultado = 0;
+	Unidade aux = j->Exercito;
+	while (aux != NULL)
+	{
+		if (aux->Nivel > 0)
+		{
+			resultado = 1;
+		}
+		aux = aux->Prox;
+	}
+	if (resultado = 1)
+		return 0;
+	else
+		return 1;
+}
+
+void Batalha(HEX pos, Jogador j)
+{
+	int tipo_inimigo,nivel_inimigo,vantagem_jog,vantagem_inim,dec;
+	if (pos->Tipo_de_Bioma == 0)
+	{
+		printf("Está um dia agradavel na ");
+	}
+	if (pos->Tipo_de_Bioma == 1)
+	{
+		printf("A neve e o gelo arrefecem a ");
+	}
+	if (pos->Tipo_de_Bioma == 2)
+	{
+		printf("O sol e a areia quente queimam a ");
+	}
+	if (pos->Tipo_de_Terreno == 0)
+	{
+		printf("planicie.\n");
+	}
+	if (pos->Tipo_de_Terreno == 1)
+	{
+		printf("descida.\n");
+	}
+	if (pos->Tipo_de_Terreno == 2)
+	{
+		printf("montanha\n");
+	}
+	tipo_inimigo = rand() % 3;
+	nivel_inimigo = rand() % 11;
+	if (nivel_inimigo <= 5)
+	{
+		nivel_inimigo = j->Exercito->Nivel - nivel_inimigo;
+	}
+	else
+	{
+		nivel_inimigo = j->Exercito->Nivel + (nivel_inimigo-5);
+	}
+	vantagem_jog = Calcular_Vantagem(pos, j->Exercito->Tipo, j->Exercito->Nivel);
+	vantagem_inim = Calcular_Vantagem(pos,tipo_inimigo,nivel_inimigo);
+	switch (tipo_inimigo)
+	{
+	case 0:
+		printf("Do lado dos inimigos estao %d soldados de Infantaria\n",nivel_inimigo);
+		break;
+	case 1:
+		printf("Do lado dos inimigos estao %d Arqueiros\n",nivel_inimigo);
+		break;
+	case 2:
+		printf("Do lado dos inimigos estao %d Cavaleiros\n",nivel_inimigo);
+		break;
+	}
+	int ganhou = 0;
+	while (Perdeu_Jogo != 1 && ganhou==0)
+	{
+		Print_Exercito(j->Exercito);
+		printf("Deseja mudar a formacao?\n1-Sim\n2-Nao\n");
+		scanf("%d", &dec);
+		if (dec == 1)
+		{
+			j->Exercito = Reorganizar_Exercito(j->Exercito);
+		}
+		system("cls");
+		if (vantagem_jog < vantagem_inim)
+		{
+			int d;
+			printf("O jogador esta em desvantagem.\nDeseja fazer retirada?\n1-Sim\n2-Atacar na mesma\n");
+			scanf("%d", &d);
+			if (d != 1)
+			{
+				printf("O jogador manda atacar a unidade mais a frente.\n");
+				int res = rand() % 3;
+				if (res == 1)
+				{
+					printf("O jogador ganhou!\n");
+					Conversao(pos, j);
+					if (pos->Capital=1)
+						j->Capitais_Conquistadas++;
+					ganhou = 1;
+				}
+				else
+				{
+					printf("O jogador perdeu a unidade!\n");
+				}
+			}
+			else
+			{
+				printf("O jogador fugiu!\n");
+				ganhou = 1;
+			}
+		}
+		else
+		{
+			if (vantagem_jog > vantagem_inim)
+			{
+				int d;
+				printf("O jogador tem a vantagem.\nAtacar?\n1-Sim\n2-Retirada\n");
+				scanf("%d", &d);
+				if (d == 1)
+				{
+					printf("O jogador manda atacar a unidade mais a frente.\n");
+					int res = rand() % 6;
+					if (res != 1)
+					{
+						printf("O jogador ganhou!\n");
+						Conversao(pos, j);
+						if (pos->Capital = 1)
+							j->Capitais_Conquistadas++;
+						ganhou = 1;
+					}
+					else
+					{
+						printf("O jogador perdeu a unidade!\n");
+					}
+				}
+				else
+				{
+					printf("O jogador fugiu!\n");
+					ganhou = 1;
+				}
+			}
+			else
+			{
+				int d;
+				printf("Ambos os exercitos estao equilibrados.\n1-Atacar\n2-Retirada\n");
+				scanf("%d", &d);
+				if (d == 1)
+				{
+					printf("O jogador manda atacar a unidade mais a frente.\n");
+					int res = rand() % 2;
+					if (res != 1)
+					{
+						printf("O jogador ganhou!\n");
+						Conversao(pos, j);
+						if (pos->Capital = 1)
+							j->Capitais_Conquistadas++;
+						ganhou = 1;
+					}
+					else
+					{
+						printf("O jogador perdeu a unidade!\n");
+					}
+				}
+				else
+				{
+					printf("O jogador fugiu!\n");
+					ganhou = 1;
+				}
+			}
+		}
+	}
+	system("pause");
+}
+
 void Evento(HEX Pos, Jogador jogador)
 {
 	system("cls");
@@ -938,7 +1286,6 @@ void Evento(HEX Pos, Jogador jogador)
 			int tipo_de_recrutas=0,decisao3;
 			printf("Encontrou um acampamento aliado!\n");
 			tipo_de_recrutas = rand() % 3;
-			printf("%d\n",tipo_de_recrutas);
 			tipo_de_recrutas = 0;
 			switch (tipo_de_recrutas)
 			{
@@ -980,7 +1327,7 @@ void Evento(HEX Pos, Jogador jogador)
 		else
 		{
 			printf("O jogador encontrou um acampamento inimigo!\n");
-			//Função da Batalha
+			Batalha(Pos, jogador);
 		}
 	}
 	else
@@ -1052,7 +1399,7 @@ void Evento(HEX Pos, Jogador jogador)
 							break;
 						case 1:
 							printf("...e conseguem!\n As tropas chegam para a batalha!\n");
-							//PORRADA!!!
+							Batalha(Pos, jogador);
 							break;
 						}
 					}
@@ -1063,13 +1410,20 @@ void Evento(HEX Pos, Jogador jogador)
 		{
 			if (Pos->Facção == 0)
 			{
+				int bonus;
 				printf("O jogador chegou a uma cidade capital.\n");
+				bonus = rand() % 201;
+				printf("Foram-lhe doados %d de ouro",bonus);
+				jogador->Ouro = jogador->Ouro + bonus;
+				bonus = rand() % 201;
+				printf("e %d de comida.", bonus);
+				jogador->Comida = jogador->Comida + bonus;
 				system("pause");
 			}
 			else
 			{
 				printf("O jogador chegou a uma capital inimiga!\n");
-				//PORRADA!!!
+				Batalha(Pos, jogador);
 			}
 		}
 	}
@@ -1077,8 +1431,7 @@ void Evento(HEX Pos, Jogador jogador)
 
 void main()
 {
-	Main_Menu();
-	
+	int ncap = 0;
 	Jogador j = NULL;
 	j = (Jogador)malloc(sizeof(struct jogador));
 	j = Iniciar_Jogador(j);
@@ -1087,38 +1440,55 @@ void main()
 	HEX Mapa = NULL,jogador;
 	Mapa = Inicializar(Mapa);
 	jogador = Mapa;
-	Add_Hex(Mapa, 1);
-	Add_Hex(Mapa, 2);
-	Add_Hex(Mapa, 3);
-	Add_Hex(Mapa, 4);
-	Add_Hex(Mapa, 5);
-	Add_Hex(Mapa, 6);
-	Add_Hex(Mapa->N, 1);
-	Add_Hex(Mapa->N, 2);
-	Add_Hex(Mapa->N, 3);
-	Add_Hex(Mapa->NO, 1);
-	Add_Hex(Mapa->NO, 6);
-	Add_Hex(Mapa->SO, 6);
-	Add_Hex(Mapa->S, 6);
-	Add_Hex(Mapa->S, 5);
-	Add_Hex(Mapa->S, 4);
-	Add_Hex(Mapa->SE, 4);
-	Add_Hex(Mapa->NE, 3);
-	Add_Hex(Mapa->NE, 4);
-	
+	Add_Hex(Mapa, 1,ncap);
+	Add_Hex(Mapa, 2,ncap);
+	Add_Hex(Mapa, 3,ncap);
+	Add_Hex(Mapa, 4,ncap);
+	Add_Hex(Mapa, 5,ncap);
+	Add_Hex(Mapa, 6,ncap);
+	Add_Hex(Mapa->N, 1,ncap);
+	Add_Hex(Mapa->N, 2,ncap);
+	Add_Hex(Mapa->N, 3,ncap);
+	Add_Hex(Mapa->NO, 1,ncap);
+	Add_Hex(Mapa->NO, 6,ncap);
+	Add_Hex(Mapa->SO, 6,ncap);
+	Add_Hex(Mapa->S, 6,ncap);
+	Add_Hex(Mapa->S, 5,ncap);
+	Add_Hex(Mapa->S, 4,ncap);
+	Add_Hex(Mapa->SE, 4,ncap);
+	Add_Hex(Mapa->NE, 3,ncap);
+	Add_Hex(Mapa->NE, 4,ncap);
 	jogador->Acampamento = 1;
 	jogador->Aldeia = 0;
 	jogador->Capital = 0;
 	jogador->Facção = 0;
-	while (Perdeu==0)
+	Main_Menu();
+	Actualizar_Interface(jogador,j);
+	Actualizar_Ligaçoes(jogador);
+	system("pause");
+	while (Perdeu==0 && j->Capitais_Conquistadas<5)
 	{
 		Evento(jogador, j);
-		Actualizar_Interface(jogador);
+		Actualizar_Interface(jogador,j);
 		jogador=Movimento(jogador);
+		if (Comida_Necessaria(j->Exercito) < j->Comida)
+			Fome(j->Exercito);
+		else
+			j->Comida -= Comida_Necessaria(j->Exercito);
 		j->X = jogador->x;
 		j->Y = jogador->y;
-		Actualizar_Interface(jogador);
+		Actualizar_Interface(jogador,j);
 		Actualizar_Ligaçoes(jogador);
+		Perdeu=Perdeu_Jogo(j);
+	}
+	system("cls");
+	if (Perdeu == 0)
+	{
+		printf("Perdeu o Jogo!");
+	}
+	else
+	{
+		printf("Ganhou o jogo!");
 	}
 	system("pause");
 	free(j);
